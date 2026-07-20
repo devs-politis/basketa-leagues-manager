@@ -614,7 +614,7 @@ public function standings($atts = []) {
 
             const cacheKey =
                 this.dataset.league + '_' + this.dataset.season;
-
+                
             if (standingsCache[cacheKey]) {
 
                 document.getElementById(
@@ -628,6 +628,19 @@ public function standings($atts = []) {
                     });
 
                 this.classList.add('active');
+
+                const url = new URL(window.location);
+
+                url.searchParams.set(
+                    'league',
+                    this.dataset.league
+                );
+
+                window.history.replaceState(
+                    {},
+                    '',
+                    url
+                );
 
                 return;
             }
