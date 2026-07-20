@@ -67,11 +67,11 @@
 
     margin:0;
 
-    font-size:22px;
+    font-size:28px;
 
     color:#fff;
 
-    font-weight:700;
+    font-weight:500;
 }
 
 .blm-standings-table{
@@ -117,6 +117,7 @@
     display:flex;
 
     align-items:center;
+    justify-content: start;
 
     gap:10px;
 }
