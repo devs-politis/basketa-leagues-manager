@@ -575,7 +575,12 @@ public function standings($atts = []) {
             </thead>
 
             <tbody id="blm-standings-body">
-                <?php echo $this->render_standings_rows($standings); ?>            
+                <?php
+                echo $this->render_standings_rows(
+                    $standings,
+                    $league_id
+                );
+                ?>
             </tbody>
 
         </table>
@@ -702,7 +707,10 @@ public function ajax_standings() {
     }
 
     wp_send_json_success(
-        $this->render_standings_rows($standings)
+        $this->render_standings_rows(
+            $standings,
+            $league_id
+        )
     );
 }
 
@@ -729,7 +737,10 @@ private function get_available_leagues($enabled) {
     return $available;
 }
 
-private function render_standings_rows($standings) {
+private function render_standings_rows(
+    $standings,
+    $league_id = 0
+) {
 
     ob_start();
 
@@ -757,17 +768,24 @@ private function render_standings_rows($standings) {
 
         ?>
 
-        <tr
-            class="<?php
-                echo ($team['position'] == 7)
-                    ? 'blm-playin-start'
-                    : (
-                        $team['position'] == 11
-                            ? 'blm-eliminated-start'
-                            : ''
-                    );
-            ?>"
-        >
+        <?php
+
+        $row_class = '';
+
+        if ($league_id == 120) {
+
+            if ($team['position'] == 7) {
+                $row_class = 'blm-playin-start';
+            }
+
+            if ($team['position'] == 11) {
+                $row_class = 'blm-eliminated-start';
+            }
+        }
+
+        ?>
+
+        <tr class="<?php echo esc_attr($row_class); ?>">
 
             <td>
                 <?php echo esc_html($team['position']); ?>
