@@ -497,6 +497,25 @@ public function standings($atts = []) {
     $all_leagues =
     BLM_API::get_leagues();
 
+    $league_name = '';
+    $league_logo = '';
+
+    foreach ($all_leagues as $league) {
+
+        if ($league['id'] == $league_id) {
+
+            $league_name = $league['name'];
+            $league_logo = $league['logo'] ?? '';
+
+            break;
+        }
+
+    }
+
+    $stage_name =
+        $standings[0][0]['group']['name']
+        ?? 'Standings';
+
     $nonce = wp_create_nonce(
         'blm_standings'
     );
@@ -556,7 +575,31 @@ public function standings($atts = []) {
 
         <div class="blm-standings-header">
 
-            <h2>Regular Season</h2>
+            <?php if (!empty($league_logo)) : ?>
+
+                <img
+                    src="<?php echo esc_url($league_logo); ?>"
+                    alt=""
+                    class="blm-header-logo"
+                >
+
+            <?php endif; ?>
+
+            <div class="blm-header-text">
+
+                <h2>
+                    <?php echo esc_html($league_name); ?>
+                </h2>
+
+                <p>
+                    <?php
+                    echo esc_html(
+                        $stage_name . ' • ' . $season
+                    );
+                    ?>
+                </p>
+
+            </div>
 
         </div>
 
@@ -765,9 +808,7 @@ public function ajax_standings() {
     );
 
     if (empty($standings[0])) {
-
         wp_send_json_error();
-
     }
 
     wp_send_json_success(
