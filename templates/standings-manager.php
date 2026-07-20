@@ -100,10 +100,6 @@ $saved = get_option(
                         League
                     </th>
 
-                    <th width="120">
-                        Season
-                    </th>
-
                     <th width="100">
                         Sort
                     </th>
@@ -123,25 +119,6 @@ $saved = get_option(
                     $saved[$league_id]
                     ?? [];
 
-                $latest_season = 0;
-
-                if (
-                    !empty(
-                        $league['seasons']
-                    )
-                ) {
-
-                    $seasons =
-                        array_column(
-                            $league['seasons'],
-                            'season'
-                        );
-
-                    rsort($seasons);
-
-                    $latest_season =
-                        $seasons[0];
-                }
 
             ?>
 
@@ -200,20 +177,6 @@ $saved = get_option(
     </div>
 
 </td>
-
-                    <td>
-
-                        <input
-                            type="number"
-                            name="leagues[<?php echo esc_attr($league_id); ?>][season]"
-                            value="<?php echo esc_attr(
-                                $settings['season']
-                                ?? $latest_season
-                            ); ?>"
-                            style="width:100px;"
-                        >
-
-                    </td>
 
                     <td>
 
