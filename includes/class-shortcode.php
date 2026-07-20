@@ -32,14 +32,22 @@ class BLM_Shortcode {
 		    'wp_ajax_nopriv_blm_load_standings',
 		    [$this, 'ajax_standings']
 		);
+
     }
 
     public function ticker($atts = []) {
 
-		  $atts = shortcode_atts([
-		    'filter' => 'false',
-		    'class'  => ''
-		], $atts);
+        wp_enqueue_style(
+            'blm-ticker',
+            BLM_URL . 'assets/css/ticker.css',
+            [],
+            BLM_VERSION
+        );
+
+        $atts = shortcode_atts([
+            'filter' => 'false',
+            'class'  => ''
+        ], $atts);
 
         $show_filter = filter_var(
             $atts['filter'],
@@ -170,92 +178,6 @@ foreach ($visible_games as $game) {
 ob_start();
 
         ?>
-
-        <style>
-
-        .blm-ticker{
-            display:flex;
-            gap:15px;
-        }
-
-        .blm-game{
-            min-width: 100%;
-            background:#1A1A1A;
-            color:#fff;
-            border-radius:12px;
-            padding:15px;
-            flex-shrink:0;
-        }
-
-        .blm-league{
-            display:flex;
-            align-items:center;
-            gap:8px;
-            margin-bottom:15px;
-            font-size:14px;
-            font-weight: 600;
-        }
-
-        .blm-league img{
-            width:22px;
-            height:22px;
-        }
-
-        .blm-team{
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            margin-bottom:10px;
-        }
-
-        .blm-team-left{
-            display:flex;
-            align-items:center;
-            gap:8px;
-        }
-
-        .blm-date{
-            font-size:12px;
-            color:#999;
-            margin-bottom:10px;
-            font-weight:600;
-        }
-
-        .blm-team img{
-            width:24px;
-            height:24px;
-        }
-
-        .blm-score{
-            font-weight:700;
-            font-size:16px;
-        }
-
-        .blm-status{
-            margin-top:12px;
-            text-align:center;
-            font-size:12px;
-            font-weight:700;
-            color:#ffc107;
-        }
-
-        .blm-ticker-filter{
-            margin-bottom:15px;
-        }
-
-        .blm-ticker-filter select{
-            min-width:220px;
-            padding:8px 12px;
-        }
-
-		.leauge-box-blm {
-			display: flex;
-		    flex-direction: row;
-		    justify-content: space-between;
-		    gap: 15px;
-		}
-
-        </style>
 
         <?php if ($show_filter) : ?>
 
@@ -506,6 +428,13 @@ ob_start();
 
 public function standings($atts = []) {
 
+    wp_enqueue_style(
+        'blm-standings',
+        BLM_URL . 'assets/css/standings.css',
+        [],
+        BLM_VERSION
+    );
+
     $saved = get_option(
         'blm_standings_leagues',
         []
@@ -627,147 +556,16 @@ public function standings($atts = []) {
             </thead>
 
             <tbody id="blm-standings-body">
-
-            <?php foreach ($standings[0] as $team) : ?>
-
-                <?php
-
-                $played =
-                    $team['games']['played']
-                    ?? 0;
-
-                $wins =
-                    $team['games']['win']['total']
-                    ?? 0;
-
-                $losses =
-                    $team['games']['lose']['total']
-                    ?? 0;
-
-                $win_pct =
-                    $team['games']['win']['percentage']
-                    ?? 0;
-
-                $form =
-                    $team['form']
-                    ?? '-';
-
-                ?>
-
-                <tr>
-
-                    <td>
-                        <?php echo esc_html($team['position']); ?>
-                    </td>
-
-                    <td class="club">
-
-                        <div class="blm-team">
-
-                            <img
-                                src="<?php echo esc_url($team['team']['logo']); ?>"
-                                alt=""
-                            >
-
-                            <span>
-                                <?php echo esc_html($team['team']['name']); ?>
-                            </span>
-
-                        </div>
-
-                    </td>
-
-                    <td><?php echo esc_html($played); ?></td>
-                    <td><?php echo esc_html($wins); ?></td>
-                    <td><?php echo esc_html($losses); ?></td>
-                    <td><?php echo esc_html($win_pct); ?></td>
-                    <td><?php echo esc_html($form); ?></td>
-
-                </tr>
-
-            <?php endforeach; ?>
-
+                <?php echo $this->render_standings_rows($standings); ?>            
             </tbody>
 
         </table>
 
     </div>
 
-    <style>
-
-    .blm-standings-tabs{
-        display:flex;
-        gap:10px;
-        margin-bottom:25px;
-        flex-wrap:wrap;
-    }
-
-    .blm-tab{
-        background:#1b1b1b;
-        color:#fff;
-        border:none;
-        padding:10px 18px;
-        border-radius:10px;
-        cursor:pointer;
-    }
-
-    .blm-tab.active{
-        background:#ff6a00;
-    }
-
-    .blm-standings-card{
-        background:#121212;
-        border-radius:16px;
-        padding:30px;
-        color:#fff;
-    }
-
-    .blm-standings-header{
-        margin-bottom:25px;
-    }
-
-    .blm-standings-header h2{
-        color:#fff;
-        font-size:36px;
-        margin:0;
-    }
-
-    .blm-standings-table{
-        width:100%;
-        border-collapse:collapse;
-    }
-
-    .blm-standings-table th{
-        color:#ff6a00;
-        text-align:left;
-        padding:15px 10px;
-        border-bottom:1px solid #333;
-    }
-
-    .blm-standings-table td{
-        padding:18px 10px;
-        border-bottom:1px solid #262626;
-    }
-
-    .blm-team{
-        display:flex;
-        align-items:center;
-        gap:12px;
-    }
-
-    .blm-team img{
-        width:28px;
-        height:28px;
-        object-fit:contain;
-    }
-
-    .club{
-        width:40%;
-    }
-
-    </style>
-
     <script>
+
+    const standingsCache = {};
 
     document
     .querySelectorAll('.blm-tab')
@@ -776,6 +574,30 @@ public function standings($atts = []) {
         tab.addEventListener(
             'click',
             function(){
+
+            if (this.classList.contains('active')) {
+                return;
+            }
+
+            const cacheKey =
+                this.dataset.league + '_' + this.dataset.season;
+
+            if (standingsCache[cacheKey]) {
+
+                document.getElementById(
+                    'blm-standings-body'
+                ).innerHTML = standingsCache[cacheKey];
+
+                document
+                    .querySelectorAll('.blm-tab')
+                    .forEach(function(t){
+                        t.classList.remove('active');
+                    });
+
+                this.classList.add('active');
+
+                return;
+            }
 
 				
 
@@ -816,19 +638,18 @@ public function standings($atts = []) {
                 .then(r => r.json())
                 .then(data => {
 
-                    if (
-                        data.success
-                    ) {
+                if (data.success) {
 
-                        document
+                    standingsCache[cacheKey] = data.data;
+
+                    document
                         .getElementById(
                             'blm-standings-body'
                         )
-                        .innerHTML =
-                            data.data;
-                    }
+                        .innerHTML = data.data;
+                }
 
-                });
+            });
 
             }
         );
@@ -860,6 +681,15 @@ public function ajax_standings() {
         wp_send_json_error();
 
     }
+
+    wp_send_json_success(
+        $this->render_standings_rows($standings)
+    );
+}
+
+
+
+private function render_standings_rows($standings) {
 
     ob_start();
 
@@ -921,10 +751,7 @@ public function ajax_standings() {
         <?php
     }
 
-    wp_send_json_success(
-        ob_get_clean()
-    );
+    return ob_get_clean();
 }
-
 	
 }

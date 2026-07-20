@@ -108,35 +108,47 @@ class BLM_API {
             $endpoint
         );
 		
-		$response = wp_remote_get(
-		    $url,
-		    [
-		        'headers' => [
-		            'x-apisports-key'
-		                => $api_key
-		        ],
-		        'timeout' => 10
-		    ]
-		);
+    $response = wp_remote_get(
+        $url,
+        [
+            'headers' => [
+                'x-apisports-key' => $api_key
+            ],
+            'timeout' => 10
+        ]
+    );
 
-        if (
-            is_wp_error(
-                $response
-            )
-        ) {
+    if (is_wp_error($response)) {
 
-            update_option(
-                'blm_api_status',
-                'error'
-            );
+        update_option(
+            'blm_api_status',
+            'error'
+        );
 
-            update_option(
-                'blm_api_last_error',
-                $response->get_error_message()
-            );
+        update_option(
+            'blm_api_last_error',
+            $response->get_error_message()
+        );
 
-            return [];
-        }
+        return [];
+    }
+
+    $status = wp_remote_retrieve_response_code($response);
+
+    if ($status !== 200) {
+
+        update_option(
+            'blm_api_status',
+            'error'
+        );
+
+        update_option(
+            'blm_api_last_error',
+            'HTTP ' . $status
+        );
+
+        return [];
+    }
 
         update_option(
             'blm_last_api_call',
@@ -237,20 +249,9 @@ class BLM_API {
 		        $cache_key
 		    );
 		
-		if ($cache !== false) {
-		
-		    update_option(
-		        'blm_cache_test',
-		        'HIT ' . current_time('mysql')
-		    );
-		
-		    return $cache;
-		}
-		
-		update_option(
-		    'blm_cache_test',
-		    'MISS ' . current_time('mysql')
-		);
+    if ($cache !== false) {
+        return $cache;
+    }
 
         $instance = new self();
 
