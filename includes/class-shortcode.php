@@ -5,6 +5,37 @@ if (!defined('ABSPATH')) {
 }
 
 class BLM_Shortcode {
+    
+    private function get_league_seasons($league_id)
+    {
+        $leagues = BLM_API::get_leagues();
+
+        foreach ($leagues as $league) {
+
+            if ($league['id'] != $league_id) {
+                continue;
+            }
+
+            if (empty($league['seasons'])) {
+                return [];
+            }
+
+            $seasons = array_column(
+                $league['seasons'],
+                'season'
+            );
+
+            rsort($seasons);
+
+            return array_slice(
+                $seasons,
+                0,
+                5
+            );
+        }
+
+        return [];
+    }
 
     public function __construct() {
 
@@ -479,9 +510,12 @@ public function standings($atts = []) {
         );
 
     $season =
-        intval(
-            $enabled[$league_id]['season']
-            ?? date('Y')
+    $enabled[$league_id]['default_season']
+    ?? date('Y');
+
+    $available_seasons =
+        $this->get_league_seasons(
+            $league_id
         );
 
 	$standings = BLM_API::get_standings(
@@ -516,8 +550,7 @@ public function standings($atts = []) {
         $standings[0][0]['group']['name']
         ?? 'Standings';
 
-    $season_label =
-    $season . '–' . substr($season + 1, -2);
+    $season_label = $season;
 
     $nonce = wp_create_nonce(
         'blm_standings'
@@ -551,7 +584,7 @@ public function standings($atts = []) {
             <button
                 class="blm-tab league-<?php echo esc_attr(sanitize_title($league_name)); ?> <?php echo $id == $league_id ? 'active' : ''; ?>"
                 data-league="<?php echo esc_attr($id); ?>"
-                data-season="<?php echo esc_attr($league['season']); ?>"
+                data-season="<?php echo esc_attr($league['default_season']); ?>"
             >
 
                 <?php if (!empty($league_logo)) : ?>
@@ -575,6 +608,29 @@ public function standings($atts = []) {
     </div>
 
     <div class="blm-standings-card">
+
+        <div class="blm-season-selector">
+
+            <label for="blm-season">
+                Season
+            </label>
+
+            <select id="blm-season">
+
+                <?php foreach ($available_seasons as $s) : ?>
+
+                    <option
+                        value="<?php echo esc_attr($s); ?>"
+                        <?php selected($s, $season); ?>
+                    >
+                        <?php echo esc_html($s); ?>
+                    </option>
+
+                <?php endforeach; ?>
+
+            </select>
+
+        </div>
 
         <div class="blm-standings-header">
 
@@ -653,123 +709,151 @@ public function standings($atts = []) {
         params.get('league');
 
 
-    document
-    .querySelectorAll('.blm-tab')
-    .forEach(function(tab){
+    function loadStandings(league, season, clickedTab = null) {
 
-        tab.addEventListener(
-            'click',
-            function(){
+    const cacheKey = league + '_' + season;
+
+    if (standingsCache[cacheKey]) {
+
+        document.getElementById(
+            'blm-standings-body'
+        ).innerHTML = standingsCache[cacheKey];
+
+        if (clickedTab) {
+
+            document
+                .querySelectorAll('.blm-tab')
+                .forEach(function(t){
+                    t.classList.remove('active');
+                });
+
+            clickedTab.classList.add('active');
+        }
+
+        const url = new URL(window.location);
+
+        url.searchParams.set('league', league);
+        url.searchParams.set('season', season);
+
+        window.history.replaceState({}, '', url);
+
+        return;
+    }
+
+    fetch(
+        '<?php echo admin_url('admin-ajax.php'); ?>',
+        {
+            method:'POST',
+            headers:{
+                'Content-Type':
+                'application/x-www-form-urlencoded'
+            },
+            body:
+                'action=blm_load_standings'
+                + '&league=' + encodeURIComponent(league)
+                + '&season=' + encodeURIComponent(season)
+                + '&nonce=' + encodeURIComponent(blmNonce)
+        }
+    )
+    .then(r => r.json())
+    .then(data => {
+
+        if (!data.success) {
+            return;
+        }
+
+        standingsCache[cacheKey] = data.data;
+
+        document.getElementById(
+            'blm-standings-body'
+        ).innerHTML = data.data;
+
+        if (clickedTab) {
+
+            document
+                .querySelectorAll('.blm-tab')
+                .forEach(function(t){
+                    t.classList.remove('active');
+                });
+
+            clickedTab.classList.add('active');
+        }
+
+        const url = new URL(window.location);
+
+        url.searchParams.set('league', league);
+        url.searchParams.set('season', season);
+
+        window.history.replaceState({}, '', url);
+
+    });
+
+}
+
+document
+.querySelectorAll('.blm-tab')
+.forEach(function(tab){
+
+    tab.addEventListener(
+        'click',
+        function(){
 
             if (this.classList.contains('active')) {
                 return;
             }
 
-            const cacheKey =
-                this.dataset.league + '_' + this.dataset.season;
-                
-            if (standingsCache[cacheKey]) {
+            const league =
+                this.dataset.league;
 
-                document.getElementById(
-                    'blm-standings-body'
-                ).innerHTML = standingsCache[cacheKey];
+            const season =
+                this.dataset.season;
 
-                document
-                    .querySelectorAll('.blm-tab')
-                    .forEach(function(t){
-                        t.classList.remove('active');
-                    });
+            loadStandings(
+                league,
+                season,
+                this
+            );
 
-                this.classList.add('active');
+        }
+    );
 
-                const url = new URL(window.location);
+});
 
-                url.searchParams.set(
-                    'league',
-                    this.dataset.league
+const seasonSelect =
+    document.getElementById(
+        'blm-season'
+    );
+
+if (seasonSelect) {
+
+    seasonSelect.addEventListener(
+        'change',
+        function(){
+
+            const activeTab =
+                document.querySelector(
+                    '.blm-tab.active'
                 );
 
-                window.history.replaceState(
-                    {},
-                    '',
-                    url
-                );
-
+            if (!activeTab) {
                 return;
             }
 
-				
+            activeTab.dataset.season =
+                this.value;
 
-                document
-                .querySelectorAll('.blm-tab')
-                .forEach(function(t){
+            loadStandings(
+                activeTab.dataset.league,
+                this.value,
+                activeTab
+            );
 
-                    t.classList.remove(
-                        'active'
-                    );
+        }
+    );
 
-                });
+}
 
-                this.classList.add(
-                    'active'
-                );
-
-                const league =
-                    this.dataset.league;
-
-                const season =
-                    this.dataset.season;
-
-                const url =
-                    new URL(window.location);
-
-                url.searchParams.set(
-                    'league',
-                    league
-                );
-
-                window.history.replaceState(
-                    {},
-                    '',
-                    url
-                );
-
-                fetch(
-                    '<?php echo admin_url('admin-ajax.php'); ?>',
-                    {
-                        method:'POST',
-                        headers:{
-                            'Content-Type':
-                            'application/x-www-form-urlencoded'
-                        },
-                        body:
-                            'action=blm_load_standings'
-                            + '&league=' + league
-                            + '&season=' + season
-                            + '&nonce=' + encodeURIComponent(blmNonce)
-                    }
-                )
-                .then(r => r.json())
-                .then(data => {
-
-                if (data.success) {
-
-                    standingsCache[cacheKey] = data.data;
-
-                    document
-                        .getElementById(
-                            'blm-standings-body'
-                        )
-                        .innerHTML = data.data;
-                }
-
-            });
-
-            }
-        );
-
-    });
-
+                
     if (requestedLeague) {
 
         const tab =
@@ -822,23 +906,29 @@ public function ajax_standings() {
     );
 }
 
-private function get_available_leagues($enabled) {
-
+private function get_available_leagues($enabled)
+{
     $available = [];
 
     foreach ($enabled as $id => $league) {
 
-        $season = intval(
-            $league['season'] ?? date('Y')
-        );
+        $seasons = $this->get_league_seasons($id);
 
-        $standings = BLM_API::get_standings(
-            $id,
-            $season
-        );
+        foreach ($seasons as $season) {
 
-        if (!empty($standings[0])) {
-            $available[$id] = $league;
+            $standings = BLM_API::get_standings(
+                $id,
+                $season
+            );
+
+            if (!empty($standings[0])) {
+
+                $league['default_season'] = $season;
+
+                $available[$id] = $league;
+
+                break;
+            }
         }
     }
 
