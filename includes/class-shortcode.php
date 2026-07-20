@@ -526,7 +526,6 @@ public function standings($atts = []) {
                 class="blm-tab league-<?php echo esc_attr(sanitize_title($league_name)); ?> <?php echo $id == $league_id ? 'active' : ''; ?>"
                 data-league="<?php echo esc_attr($id); ?>"
                 data-season="<?php echo esc_attr($league['season']); ?>"
-                data-slug="<?php echo esc_attr(sanitize_title($league_name)); ?>"
             >
 
                 <?php if (!empty($league_logo)) : ?>
@@ -592,6 +591,15 @@ public function standings($atts = []) {
 
     const standingsCache = {};
 
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const requestedLeague =
+        params.get('league');
+
+
     document
     .querySelectorAll('.blm-tab')
     .forEach(function(tab){
@@ -646,6 +654,20 @@ public function standings($atts = []) {
                 const season =
                     this.dataset.season;
 
+                const url =
+                    new URL(window.location);
+
+                url.searchParams.set(
+                    'league',
+                    league
+                );
+
+                window.history.replaceState(
+                    {},
+                    '',
+                    url
+                );
+
                 fetch(
                     '<?php echo admin_url('admin-ajax.php'); ?>',
                     {
@@ -680,6 +702,21 @@ public function standings($atts = []) {
         );
 
     });
+
+    if (requestedLeague) {
+
+        const tab =
+            document.querySelector(
+                '.blm-tab[data-league="' +
+                requestedLeague +
+                '"]'
+            );
+
+        if (tab && !tab.classList.contains('active')) {
+            tab.click();
+        }
+
+    }
 
     </script>
 
