@@ -151,6 +151,38 @@
     border-top:2px solid #FF5100 !important;
 }
 
+.blm-standings-header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.blm-header-logo{
+    width:52px;
+    height:52px;
+    object-fit:contain;
+    flex-shrink:0;
+}
+
+.blm-header-text{
+    display:flex;
+    flex-direction:column;
+}
+
+.blm-header-text h2{
+    margin:0;
+    color:#fff;
+    font-size:22px;
+    line-height:1.2;
+}
+
+.blm-header-text p{
+    margin:4px 0 0;
+    color:#bbb;
+    font-size:14px;
+}
+
 @media(max-width:768px){
 
     .blm-tab{

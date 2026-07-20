@@ -516,6 +516,9 @@ public function standings($atts = []) {
         $standings[0][0]['group']['name']
         ?? 'Standings';
 
+    $season_label =
+    $season . '–' . substr($season + 1, -2);
+
     $nonce = wp_create_nonce(
         'blm_standings'
     );
@@ -575,33 +578,33 @@ public function standings($atts = []) {
 
         <div class="blm-standings-header">
 
-            <?php if (!empty($league_logo)) : ?>
+        <?php if (!empty($league_logo)) : ?>
 
-                <img
-                    src="<?php echo esc_url($league_logo); ?>"
-                    alt=""
-                    class="blm-header-logo"
-                >
+            <img
+                src="<?php echo esc_url($league_logo); ?>"
+                alt=""
+                class="blm-header-logo"
+            >
 
-            <?php endif; ?>
+        <?php endif; ?>
 
-            <div class="blm-header-text">
+        <div class="blm-header-text">
 
-                <h2>
-                    <?php echo esc_html($league_name); ?>
-                </h2>
+            <h2>
+                <?php echo esc_html($league_name); ?>
+            </h2>
 
-                <p>
-                    <?php
-                    echo esc_html(
-                        $stage_name . ' • ' . $season
-                    );
-                    ?>
-                </p>
-
-            </div>
+            <p>
+                <?php
+                echo esc_html(
+                    $stage_name . ' • ' . $season_label
+                );
+                ?>
+            </p>
 
         </div>
+
+    </div>
 
         <table class="blm-standings-table">
 
