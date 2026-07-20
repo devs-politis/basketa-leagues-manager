@@ -757,7 +757,17 @@ private function render_standings_rows($standings) {
 
         ?>
 
-        <tr>
+        <tr
+            class="<?php
+                echo ($team['position'] == 7)
+                    ? 'blm-playin-start'
+                    : (
+                        $team['position'] == 11
+                            ? 'blm-eliminated-start'
+                            : ''
+                    );
+            ?>"
+        >
 
             <td>
                 <?php echo esc_html($team['position']); ?>
