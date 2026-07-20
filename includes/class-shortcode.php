@@ -523,9 +523,10 @@ public function standings($atts = []) {
             ?>
 
             <button
-                class="blm-tab <?php echo $id == $league_id ? 'active' : ''; ?>"
+                class="blm-tab league-<?php echo esc_attr(sanitize_title($league_name)); ?> <?php echo $id == $league_id ? 'active' : ''; ?>"
                 data-league="<?php echo esc_attr($id); ?>"
                 data-season="<?php echo esc_attr($league['season']); ?>"
+                data-slug="<?php echo esc_attr(sanitize_title($league_name)); ?>"
             >
 
                 <?php if (!empty($league_logo)) : ?>
