@@ -495,7 +495,11 @@ public function standings($atts = []) {
     }
 
     $all_leagues =
-        BLM_API::get_leagues();
+    BLM_API::get_leagues();
+
+    $nonce = wp_create_nonce(
+        'blm_standings'
+    );
 
     ob_start();
     ?>
@@ -588,6 +592,9 @@ public function standings($atts = []) {
     </div>
 
     <script>
+
+    const blmNonce =
+    '<?php echo esc_js($nonce); ?>';
 
     const standingsCache = {};
 
@@ -693,6 +700,7 @@ public function standings($atts = []) {
                             'action=blm_load_standings'
                             + '&league=' + league
                             + '&season=' + season
+                            + '&nonce=' + encodeURIComponent(blmNonce)
                     }
                 )
                 .then(r => r.json())
@@ -739,6 +747,11 @@ public function standings($atts = []) {
 }
 
 public function ajax_standings() {
+
+    check_ajax_referer(
+        'blm_standings',
+        'nonce'
+    );
 
     $league_id =
         intval($_POST['league'] ?? 0);
