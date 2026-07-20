@@ -464,6 +464,12 @@ public function standings($atts = []) {
 
     });
 
+    $enabled = $this->get_available_leagues($enabled);
+
+    if (empty($enabled)) {
+        return '';
+    }
+
     $league_ids =
         array_keys($enabled);
 
@@ -500,18 +506,19 @@ public function standings($atts = []) {
 
             <?php
 
-            $league_name = $id;
+                $league_name = $id;
+                $league_logo = '';
 
-            foreach ($all_leagues as $l) {
+                foreach ($all_leagues as $l) {
 
-                if ($l['id'] == $id) {
+                    if ($l['id'] == $id) {
 
-                    $league_name =
-                        $l['name'];
+                        $league_name = $l['name'];
+                        $league_logo = $l['logo'] ?? '';
 
-                    break;
+                        break;
+                    }
                 }
-            }
 
             ?>
 
@@ -521,7 +528,19 @@ public function standings($atts = []) {
                 data-season="<?php echo esc_attr($league['season']); ?>"
             >
 
-                <?php echo esc_html($league_name); ?>
+                <?php if (!empty($league_logo)) : ?>
+
+                    <img
+                        src="<?php echo esc_url($league_logo); ?>"
+                        alt=""
+                        class="blm-tab-logo"
+                    >
+
+                <?php endif; ?>
+
+                <span>
+                    <?php echo esc_html($league_name); ?>
+                </span>
 
             </button>
 
@@ -687,7 +706,28 @@ public function ajax_standings() {
     );
 }
 
+private function get_available_leagues($enabled) {
 
+    $available = [];
+
+    foreach ($enabled as $id => $league) {
+
+        $season = intval(
+            $league['season'] ?? date('Y')
+        );
+
+        $standings = BLM_API::get_standings(
+            $id,
+            $season
+        );
+
+        if (!empty($standings[0])) {
+            $available[$id] = $league;
+        }
+    }
+
+    return $available;
+}
 
 private function render_standings_rows($standings) {
 
