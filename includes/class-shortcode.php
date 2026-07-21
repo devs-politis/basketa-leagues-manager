@@ -397,9 +397,18 @@ ob_start();
 
         </div>
 
-        <?php
+    <?php
 
         return ob_get_clean();
     }
+
+    public function standings($atts = [])
+    {
+        $frontend = new BLM_Frontend_Standings();
+
+        return $frontend->render($atts);
+    }
+
+}
 
 }
