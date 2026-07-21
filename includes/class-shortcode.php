@@ -6,46 +6,36 @@ if (!defined('ABSPATH')) {
 
 class BLM_Shortcode {
     
-private function get_league_seasons($league_id)
-{
-    $leagues = BLM_API::get_leagues();
+    private function get_league_seasons($league_id)
+    {
+        $leagues = BLM_API::get_leagues();
 
-    foreach ($leagues as $league) {
+        foreach ($leagues as $league) {
 
-        if ($league['id'] != $league_id) {
-            continue;
+            if ($league['id'] != $league_id) {
+                continue;
+            }
+
+            if (empty($league['seasons'])) {
+                return [];
+            }
+
+            $seasons = array_column(
+                $league['seasons'],
+                'season'
+            );
+
+            rsort($seasons);
+
+            return array_slice(
+                $seasons,
+                0,
+                5
+            );
         }
 
-        if (empty($league['seasons'])) {
-            return [];
-        }
-
-        usort($league['seasons'], function($a, $b){
-            return $b['season'] <=> $a['season'];
-        });
-
-        $result = [];
-
-        foreach (array_slice($league['seasons'], 0, 5) as $season) {
-
-            $startYear = date('Y', strtotime($season['start']));
-            $endYear   = date('Y', strtotime($season['end']));
-
-            $label = ($startYear == $endYear)
-                ? $startYear
-                : $startYear . '-' . $endYear;
-
-            $result[] = [
-                'value' => $season['season'],
-                'label' => $label,
-            ];
-        }
-
-        return $result;
+        return [];
     }
-
-    return [];
-}
 
     public function __construct() {
 
@@ -630,11 +620,11 @@ public function standings($atts = []) {
 
                 <?php foreach ($available_seasons as $s) : ?>
 
-                <option
-                    value="<?php echo esc_attr($s['value']); ?>"
-                    <?php selected($s['value'], $season); ?>
+                    <option
+                    value="<?php echo esc_attr($s); ?>"
+                    <?php selected($s, $season); ?>
                 >
-                    <?php echo esc_html($s['label']); ?>
+                    <?php echo esc_html($s . '-' . ($s + 1)); ?>
                 </option>
 
                 <?php endforeach; ?>
