@@ -225,9 +225,11 @@ class BLM_Frontend_Standings
 
     $enabled = $this->get_available_leagues($enabled);
 
-    return $this->no_standings(
-        'No active leagues.'
-    );
+    if (empty($enabled)) {
+        return $this->no_standings(
+            'No active leagues.'
+        );
+    }
 
     $league_ids = array_keys($enabled);
 
@@ -247,9 +249,11 @@ class BLM_Frontend_Standings
         $season
     );
 
-    return $this->no_standings(
-        'Standings are not available.'
-    );
+    if (empty($standings[0])) {
+        return $this->no_standings(
+            'Standings are not available.'
+        );
+    }
 
     $all_leagues = BLM_API::get_leagues();
 
