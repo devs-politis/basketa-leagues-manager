@@ -539,11 +539,23 @@ public function standings($atts = []) {
     }
 
     $stage_name =
-        $standings[0][0]['group']['name']
-        ?? 'Standings';
+    $standings[0][0]['group']['name']
+    ?? 'Standings';
 
-    $season_label =
-    $season . '-' . ($season + 1);
+    $single_year_leagues = [
+        120 // EuroLeague
+    ];
+
+    if (in_array($league_id, $single_year_leagues, true)) {
+
+        $season_label = $season;
+
+    } else {
+
+        $season_label =
+            $season . '-' . ($season + 1);
+
+    }
 
     $nonce = wp_create_nonce(
         'blm_standings'
@@ -608,16 +620,39 @@ public function standings($atts = []) {
                 Season
             </label>
 
+            <?php
+
+            $single_year_leagues = [
+                120 // EuroLeague
+            ];
+
+            ?>
+
             <select id="blm-season">
 
                 <?php foreach ($available_seasons as $s) : ?>
 
-                <option
-                    value="<?php echo esc_attr($s['season']); ?>"
-                    <?php selected($s['season'], $season); ?>
-                >
-                    <?php echo esc_html($s['season'] . '-' . date('Y', strtotime($s['end']))); ?>
-                </option>
+                <?php
+
+                    $label = in_array(
+                        $league_id,
+                        $single_year_leagues,
+                        true
+                    )
+                    ? $s['season']
+                    : $s['season'] . '-' . date(
+                        'Y',
+                        strtotime($s['end'])
+                    );
+
+                    ?>
+
+                    <option
+                        value="<?php echo esc_attr($s['season']); ?>"
+                        <?php selected($s['season'], $season); ?>
+                    >
+                        <?php echo esc_html($label); ?>
+                    </option>
 
                 <?php endforeach; ?>
 
