@@ -20,10 +20,10 @@ class BLM_Shortcode {
                 return [];
             }
 
-            $seasons = array_column(
-                $league['seasons'],
-                'season'
-            );
+            echo '<pre>';
+                print_r($league['seasons']);
+                echo '</pre>';
+                exit;
 
             rsort($seasons);
 
@@ -850,9 +850,7 @@ if (seasonSelect) {
 
         }
     );
-
 }
-
                 
     if (requestedLeague) {
 
@@ -887,7 +885,9 @@ public function ajax_standings() {
         intval($_POST['league'] ?? 0);
 
     $season =
-        intval($_POST['season'] ?? date('Y'));
+    sanitize_text_field(
+        $_POST['season'] ?? ''
+    );
 
     $standings = BLM_API::get_standings(
         $league_id,
