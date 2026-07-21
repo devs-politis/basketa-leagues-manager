@@ -3,7 +3,7 @@
 Plugin Name: Basketa Leagues Manager
 Description: Manage Basketball Leagues, Ticker & Standings from API Sports
 Version: 2.0.0
-Author: Basketa
+Author: Efi Kakouni
 */
 
 if (!defined('ABSPATH')) {
