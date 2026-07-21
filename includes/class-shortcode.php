@@ -19,16 +19,8 @@ class BLM_Shortcode {
             if (empty($league['seasons'])) {
                 return [];
             }
-
-            $seasons = array_column(
-                $league['seasons'],
-                'season'
-            );
-
-            rsort($seasons);
-
             return array_slice(
-                $seasons,
+                $league['seasons'],
                 0,
                 5
             );
