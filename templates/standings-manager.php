@@ -100,6 +100,10 @@ $saved = get_option(
                         League
                     </th>
 
+                    <th width="180">
+                        Default Season
+                    </th>
+
                     <th width="100">
                         Sort
                     </th>
@@ -144,39 +148,73 @@ $saved = get_option(
 
                     <td>
 
-    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="display:flex;align-items:center;gap:10px;">
 
-        <?php if (!empty($league['logo'])) : ?>
+                            <?php if (!empty($league['logo'])) : ?>
 
-            <img
-                src="<?php echo esc_url($league['logo']); ?>"
-                alt=""
-            >
+                                <img
+                                    src="<?php echo esc_url($league['logo']); ?>"
+                                    alt=""
+                                >
 
-        <?php endif; ?>
+                            <?php endif; ?>
 
-        <div>
+                            <div>
 
-            <strong>
-                <?php echo esc_html(
-                    $league['name']
-                ); ?>
-            </strong>
+                                <strong>
+                                    <?php echo esc_html(
+                                        $league['name']
+                                    ); ?>
+                                </strong>
 
-            <br>
+                                <br>
 
-            <small style="color:#666;">
-                League ID:
-                <?php echo intval(
-                    $league_id
-                ); ?>
-            </small>
+                                <small style="color:#666;">
+                                    League ID:
+                                    <?php echo intval(
+                                        $league_id
+                                    ); ?>
+                                </small>
 
-        </div>
+                            </div>
 
-    </div>
+                        </div>
 
-</td>
+                    </td>
+
+                    <td>
+
+                    echo '<pre>';
+                    print_r(array_column($league['seasons'], 'season'));
+                    echo '</pre>';
+
+                        <select name="leagues[<?php echo esc_attr($league_id); ?>][season]">
+
+                            <?php
+                            $seasons = array_slice(
+                                $league['seasons'] ?? [],
+                                0,
+                                5
+                            );
+
+                            foreach ($seasons as $season) :
+                            ?>
+
+                                <option
+                                    value="<?php echo esc_attr($season['season']); ?>"
+                                    <?php selected(
+                                        $settings['season'] ?? '',
+                                        $season['season']
+                                    ); ?>
+                                >
+                                    <?php echo esc_html($season['season']); ?>
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                    </td>
 
                     <td>
 
