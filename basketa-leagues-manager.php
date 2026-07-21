@@ -16,6 +16,7 @@ define('BLM_URL', plugin_dir_url(__FILE__));
 
 require_once BLM_PATH . 'includes/class-api.php';
 require_once BLM_PATH . 'includes/class-admin.php';
+require_once BLM_PATH . 'includes/class-frontend-standings.php';
 require_once BLM_PATH . 'includes/class-shortcode.php';
 
 /*

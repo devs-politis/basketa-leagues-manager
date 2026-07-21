@@ -22,18 +22,30 @@ class BLM_Admin {
 	
 	}
 
-	public function assets($hook) {
+	public function assets($hook)
+	{
+		if (strpos($hook, 'blm-ticker') === false) {
+			return;
+		}
 
-	    if (
-	        strpos($hook, 'blm-ticker')
-	        === false
-	    ) {
-	        return;
-	    }
-	
-	    wp_enqueue_script(
-	        'jquery-ui-sortable'
-	    );
+		wp_enqueue_style(
+			'blm-admin-ticker',
+			BLM_URL . 'assets/css/admin-ticker.css',
+			[],
+			BLM_VERSION
+		);
+
+		wp_enqueue_script(
+			'jquery-ui-sortable'
+		);
+
+		wp_enqueue_script(
+			'blm-admin-ticker',
+			BLM_URL . 'assets/js/admin-ticker.js',
+			['jquery', 'jquery-ui-sortable'],
+			BLM_VERSION,
+			true
+		);
 	}
 
     public function menu() {
