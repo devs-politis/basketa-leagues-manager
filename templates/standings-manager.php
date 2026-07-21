@@ -184,11 +184,11 @@ $saved = get_option(
 
                     <td>
 
-                    <?php
-                        echo '<pre>';
-                        print_r(array_column($league['seasons'] ?? [], 'season'));
-                        echo '</pre>';
-                        ?>
+                   <?php
+                    echo '<pre>';
+                    var_dump(array_column($league['seasons'] ?? [], 'season'));
+                    echo '</pre>';
+                    ?>
 
                         <select name="leagues[<?php echo esc_attr($league_id); ?>][season]">
 
