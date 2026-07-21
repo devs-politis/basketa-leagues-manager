@@ -174,6 +174,15 @@ class BLM_Frontend_Standings
         );
     }
 
+    private function no_standings($message = 'No standings available.')
+    {
+        return '
+            <div class="blm-no-standings">
+                <p>' . esc_html($message) . '</p>
+            </div>
+        ';
+    }
+
     public function render($atts = [])
 {
     wp_enqueue_style(
@@ -189,7 +198,9 @@ class BLM_Frontend_Standings
     );
 
     if (empty($saved)) {
-        return '';
+        return $this->no_standings(
+            'No leagues configured.'
+        );
     }
 
     $enabled = array_filter(
@@ -214,9 +225,9 @@ class BLM_Frontend_Standings
 
     $enabled = $this->get_available_leagues($enabled);
 
-    if (empty($enabled)) {
-        return '';
-    }
+    return $this->no_standings(
+        'No active leagues.'
+    );
 
     $league_ids = array_keys($enabled);
 
@@ -236,9 +247,9 @@ class BLM_Frontend_Standings
         $season
     );
 
-    if (empty($standings[0])) {
-        return '';
-    }
+    return $this->no_standings(
+        'Standings are not available.'
+    );
 
     $all_leagues = BLM_API::get_leagues();
 

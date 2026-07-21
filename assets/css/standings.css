@@ -183,6 +183,20 @@
     font-size:14px;
 }
 
+.blm-no-standings{
+    padding:40px;
+    text-align:center;
+    background:#fff;
+    border:1px solid #e5e5e5;
+    border-radius:10px;
+}
+
+.blm-no-standings p{
+    margin:0;
+    color:#666;
+    font-size:15px;
+}
+
 @media(max-width:768px){
 
     .blm-tab{
