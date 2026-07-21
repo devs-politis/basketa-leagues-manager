@@ -612,11 +612,11 @@ public function standings($atts = []) {
 
                 <?php foreach ($available_seasons as $s) : ?>
 
-                    <option
-                    value="<?php echo esc_attr($s); ?>"
-                    <?php selected($s, $season); ?>
+                <option
+                    value="<?php echo esc_attr($s['season']); ?>"
+                    <?php selected($s['season'], $season); ?>
                 >
-                    <?php echo esc_html($s . '-' . ($s + 1)); ?>
+                    <?php echo esc_html($s['season'] . '-' . date('Y', strtotime($s['end']))); ?>
                 </option>
 
                 <?php endforeach; ?>
@@ -911,12 +911,12 @@ private function get_available_leagues($enabled)
 
             $standings = BLM_API::get_standings(
                 $id,
-                $season
+                $season['season']
             );
 
             if (!empty($standings[0])) {
 
-                $league['default_season'] = $season;
+                $league['default_season'] = $season['season'];
 
                 $available[$id] = $league;
 
