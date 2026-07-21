@@ -402,45 +402,4 @@ ob_start();
         return ob_get_clean();
     }
 
-
-class BLM_Shortcode
-{
-    private $frontend_standings;
-
-    public function __construct()
-    {
-        $this->frontend_standings = new BLM_Frontend_Standings();
-
-        add_shortcode(
-            'basketa_ticker',
-            [$this, 'ticker']
-        );
-
-        add_shortcode(
-            'basketa_leagues',
-            [$this, 'ticker']
-        );
-
-        add_shortcode(
-            'basketa_standings',
-            [$this, 'standings']
-        );
-
-        add_action(
-            'wp_ajax_blm_load_standings',
-            [$this->frontend_standings, 'ajax']
-        );
-
-        add_action(
-            'wp_ajax_nopriv_blm_load_standings',
-            [$this->frontend_standings, 'ajax']
-        );
-    }
-
-    public function standings($atts = [])
-    {
-        return $this->frontend_standings->render($atts);
-    }
-}
-
 }
