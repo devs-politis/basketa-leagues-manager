@@ -20,10 +20,10 @@ class BLM_Shortcode {
                 return [];
             }
 
-            echo '<pre>';
-                print_r($league['seasons']);
-                echo '</pre>';
-                exit;
+            $seasons = array_column(
+                $league['seasons'],
+                'season'
+            );
 
             rsort($seasons);
 
@@ -550,7 +550,8 @@ public function standings($atts = []) {
         $standings[0][0]['group']['name']
         ?? 'Standings';
 
-    $season_label = $season;
+    $season_label =
+    $season . '-' . ($season + 1);
 
     $nonce = wp_create_nonce(
         'blm_standings'
@@ -623,7 +624,7 @@ public function standings($atts = []) {
                         value="<?php echo esc_attr($s); ?>"
                         <?php selected($s, $season); ?>
                     >
-                        <?php echo esc_html($s); ?>
+                        <?php echo esc_html($s . '-' . ($s + 1)); ?>
                     </option>
 
                 <?php endforeach; ?>
